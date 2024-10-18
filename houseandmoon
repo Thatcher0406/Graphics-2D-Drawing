@@ -1,0 +1,61 @@
+import cairo
+import math
+
+# Set up the surface and context
+WIDTH, HEIGHT = 500, 300
+surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, WIDTH, HEIGHT)
+cr = cairo.Context(surface)
+
+# Set the background to white
+cr.set_source_rgb(1, 1, 1)  # White background
+cr.paint()
+
+# draw a rectangle 
+def draw_rectangle(x, y, width, height):
+    cr.set_source_rgb(1, 1, 1)  # White fill for the house and windows
+    cr.rectangle(x, y, width, height)
+    cr.fill_preserve()
+    cr.set_source_rgb(0, 0, 0)  # Black border
+    cr.stroke()
+
+#  draw the house
+def draw_house():
+    # Base of the house 
+    draw_rectangle(100, 150, 200, 100)
+
+    # Roof of the house
+    cr.move_to(90, 150)   # Left
+    cr.line_to(310, 150)  # Right
+    cr.line_to(200, 90)   # Top 
+    cr.close_path()
+    cr.set_source_rgb(1, 1, 1)  
+    cr.fill_preserve()
+    cr.set_source_rgb(0, 0, 0) 
+    cr.stroke()
+
+    # Windows 
+    draw_rectangle(130, 170, 40, 40)  # Left 
+    draw_rectangle(230, 170, 40, 40)  # Right 
+    draw_rectangle(175, 120, 30, 30)  # Top window
+
+# crescent moon
+def draw_crescent_moon():
+   
+    cr.arc(400, 80, 40, 0, 2 * math.pi)  
+    cr.set_source_rgb(1, 1, 1)  
+    cr.fill()
+
+    # crescent
+    cr.arc(385, 80, 40, 0, 2 * math.pi) 
+    cr.set_source_rgb(0.85, 0.85, 0.85) 
+    cr.fill()
+
+# Call the functions to draw the house and the moon
+draw_house()
+draw_crescent_moon()
+
+# Save the result to a PNG file
+surface.write_to_png("house_and_moon_exact.png")
+
+
+surface.finish()
