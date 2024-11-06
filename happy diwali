@@ -1,0 +1,149 @@
+import math
+import cairo
+import random
+import time
+
+WIDTH, HEIGHT = 600, 600
+surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, WIDTH, HEIGHT)
+context = cairo.Context(surface)
+
+
+def draw_background(context):
+    #  background colours group members to update any changes
+    gradient = cairo.LinearGradient(0, 0, 0, HEIGHT)
+    gradient.add_color_stop_rgb(0, 0.2, 0.1, 0.3)  # Dark purple
+    gradient.add_color_stop_rgb(1, 0.5, 0.2, 0.5)  # Lighter purple
+    context.set_source(gradient)
+    context.paint()
+
+
+def draw_firework(context, center_x, center_y, size):
+    colors = [
+        (1, 0, 0),  # Red
+        (1, 1, 0),  # Yellow
+        (0, 1, 0),  # Green
+        (0, 0, 1),  # Blue
+        (1, 0.5, 0),  # Orange
+        (1, 0, 1)  # Magenta
+    ]
+
+    for _ in range(20):  # make the firework drop
+        angle = random.uniform(0, 2 * math.pi)
+        length = random.uniform(size * 0.5, size)
+        context.set_source_rgb(*random.choice(colors))
+        context.move_to(center_x, center_y)
+        context.line_to(center_x + length * math.cos(angle), center_y + length * math.sin(angle))
+        context.stroke()
+
+
+def draw_sphere(context, center_x, center_y, radius):
+    context.arc(center_x, center_y, radius, 0, 2 * math.pi)
+    gradient = cairo.RadialGradient(center_x - radius * 0.5, center_y - radius * 0.5, radius * 0.2,
+                                    center_x, center_y, radius)
+    gradient.add_color_stop_rgb(0, 1, 1, 1)  # White
+    gradient.add_color_stop_rgb(0.7, 1, 0.8, 0.5)  # Soft pink
+    gradient.add_color_stop_rgb(1, 0.2, 0.1, 0.5)  # Deep rose
+    context.set_source(gradient)
+    context.fill()
+
+
+def draw_candle(context, center_x, center_y):
+    # Candle body
+    context.set_source_rgb(1, 0.9, 0.5)  # Light yellow
+    context.rectangle(center_x - 10, center_y - 40, 20, 40)
+    context.fill()
+
+    # fireee
+    context.set_source_rgb(1, 0.6, 0)  # Orange
+    context.move_to(center_x, center_y - 40)
+    context.line_to(center_x + 6, center_y - 70)
+    context.line_to(center_x - 6, center_y - 70)
+    context.close_path()
+    context.fill()
+
+
+def draw_bowl(context, center_x, center_y, radius):
+    context.set_source_rgb(0.9, 0.5, 0.2)  # Copper color for the bowl
+    context.move_to(center_x - radius, center_y)
+    context.curve_to(center_x - radius * 0.5, center_y - radius * 1.5,  # Control point 1
+                     center_x + radius * 0.5, center_y - radius * 1.5,  # Control point 2
+                     center_x + radius, center_y)  # Endpoint
+    context.curve_to(center_x + radius, center_y,  # Control point 3
+                     center_x, center_y + radius * 1.5,  # Endpoint
+                     center_x - radius, center_y)  # Return to start
+    context.fill()
+
+
+def draw_stars(context, num_stars):
+    for _ in range(num_stars):
+        x = random.randint(0, WIDTH)
+        y = random.randint(0, HEIGHT // 2)
+        size = random.randint(5, 10)
+        context.set_source_rgba(1, 1, 0, random.uniform(0.5, 1))  # Yellow stars with random opacity
+        context.arc(x, y, size, 0, 2 * math.pi)
+        context.fill()
+
+
+def draw_happy_diwali(context):
+    context.set_source_rgb(1, 1, 0)  #  text colour
+    context.select_font_face("Serif", cairo.FONT_SLANT_OBLIQUE, cairo.FONT_WEIGHT_BOLD)
+    context.set_font_size(60)
+    context.move_to(150, HEIGHT - 50)  # text position in this case below 
+    context.show_text("Happy Diwali!")
+
+
+#  background
+draw_background(context)
+
+# Draw fireworks
+for _ in range(10):  # Number of fireworks
+    x = random.randint(50, WIDTH - 50)
+    y = random.randint(50, HEIGHT // 2 - 50)
+    size = random.randint(40, 80)
+    draw_firework(context, x, y, size)
+
+# Draw the sphere with bowl
+draw_sphere(context, WIDTH // 2, HEIGHT // 2, 120)
+draw_bowl(context, WIDTH // 2, HEIGHT // 2 + 20, 100)
+
+# Draw the candle on top of the bowl
+draw_candle(context, WIDTH // 2, HEIGHT // 2 - 40)
+
+# Draw the message at the bottom
+draw_happy_diwali(context)
+
+
+surface.write_to_png("diwali_with_bowl.png")
+
+
+time.sleep(10)
+
+
+context.set_source_rgba(0, 0, 0, 0)  # Clear the canvas
+
+# Draw the background again
+draw_background(context)
+
+# Draw fireworks again
+for _ in range(10):  # Number of fireworks
+    x = random.randint(50, WIDTH - 50)
+    y = random.randint(50, HEIGHT // 2 - 50)
+    size = random.randint(40, 80)
+    draw_firework(context, x, y, size)
+
+# Draw the sphere again
+draw_sphere(context, WIDTH // 2, HEIGHT // 2, 120)
+
+# Draw stars 
+draw_stars(context, 100)  # Number of stars
+
+
+draw_candle(context, WIDTH // 2, HEIGHT // 2 - 40)
+
+# Draw the message at the bottom again
+draw_happy_diwali(context)
+
+# Save the final image with stars
+surface.write_to_png("happydiwali.png")
+
+print("Diwali-computerproject is ready!")
